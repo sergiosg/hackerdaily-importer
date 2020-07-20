@@ -1,4 +1,8 @@
 {
+  "name": "HackerDaily Importer",
+  "description": "The import program for HackerDaily to import all new and updated Hacker News posts",
+  "author": "Ruben van Eldik",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint",
     "start": "node index.js"
