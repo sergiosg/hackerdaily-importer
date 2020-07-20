@@ -8,12 +8,19 @@ require('dotenv').config()
  *
  * @return {Object} The data from the Hacker News server
  */
-module.exports = async query => {
+const queryHackerNews = async query => {
   try {
     const response = await fetch(`${process.env.HN_URL}/${query}.json`)
     const json = await response.json()
     return json
   } catch (error) {
+    // If there was a 'FetchError', try again, otherwise return undefined
+    if (error.name === 'FetchError') {
+      console.error('There was a fetch error for Hacker News')
+      return await queryHackerNews(query)
+    }
     console.error(error)
   }
 }
+
+module.exports = queryHackerNews
