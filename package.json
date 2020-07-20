@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "lint": "eslint"
+    "lint": "eslint",
+    "start": "node index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
