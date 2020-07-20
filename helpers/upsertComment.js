@@ -4,7 +4,7 @@ const unixToIsoString = require('./unixToIsoString')
 
 const query = `
   mutation ($comment: comments_insert_input!) {
-    insert_comment(object: $comment) {
+    insert_comment(object: $comment, on_conflict: {constraint: comments_pkey, update_columns: [text, user_id, story_id, parent_comment_id, ]}) {
       id
     }
   }

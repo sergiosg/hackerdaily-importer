@@ -11,7 +11,7 @@ const webpageQuery = `
 
 const storyQuery = `
   mutation ($story: stories_insert_input!) {
-    insert_story(object: $story) {
+    insert_story(object: $story, on_conflict: {constraint: stories_pkey, update_columns: [user_id, title, text, url, score, descendants, dead]}) {
       id
     }
   }
