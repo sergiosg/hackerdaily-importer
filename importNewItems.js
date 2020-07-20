@@ -1,6 +1,6 @@
 const fetchItemsToFetch = require('./helpers/fetchItemsToFetch')
 const queryHackerNews = require('./helpers/queryHackerNews')
-const fetchOrCreateUser = require('./helpers/fetchOrCreateUser')
+const upsertUser = require('./helpers/upsertUser')
 const upsertStory = require('./helpers/upsertStory')
 const upsertComment = require('./helpers/upsertComment')
 
@@ -21,7 +21,7 @@ module.exports = async () => {
     if (item === null) continue
 
     // Create the user if it doesn't exist yet
-    if (item.by) await fetchOrCreateUser(item.by)
+    if (item.by) await upsertUser(item.by)
 
     // Create the story or comment
     if (item.type === 'story') upsertStory(item)
