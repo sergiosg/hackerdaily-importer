@@ -17,13 +17,15 @@ const query = `
   *
   * @return {void}
   */
-module.exports = async ({ id, by, text, parent, time }) => {
+module.exports = async ({ id, by, text, parent, time, deleted = false, dead = false }) => {
   const { story, parentComment } = await fetchAscendants(parent)
   if (!story) return
 
   const comment = {
     id,
     text,
+    deleted,
+    dead,
     user_id: by,
     story_id: story,
     parent_comment_id: parentComment,
