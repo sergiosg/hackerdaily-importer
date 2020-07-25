@@ -1,5 +1,5 @@
 {
-  "name": "HackerDaily Importer",
+  "name": "hackerdaily-importer",
   "description": "The import program for HackerDaily to import all new and updated Hacker News posts",
   "author": "Ruben van Eldik",
   "version": "1.0.0",
