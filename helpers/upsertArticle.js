@@ -50,7 +50,7 @@ module.exports = async ({ url, score }) => {
         text: article.articleBody,
         html: article.articleBodyHtml,
         probability: article.probability,
-        length: article.articleBody.split(' ').length
+        length: article.articleBody ? article.articleBody.split(' ').length : null
       }
 
       const response = await queryHackerDaily(upsertArticleQuery, { article: articleFields })
