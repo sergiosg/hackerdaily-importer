@@ -36,19 +36,19 @@ module.exports = async ({ url, score }) => {
     // Scrape the article from Scrapinghub
     const [{ article }] = await queryScrapinghub(url)
 
-    // If the article exists, add it to the HackerDaily database
-    if (article && article.canonicalUrl && article.headline) {
+    // If the Scrapinghub api returned an article, add it to the HackerDaily database
+    if (article) {
       const articleFields = {
-        canonical_url: article.canonicalUrl,
-        headline: article.headline,
+        canonical_url: article.canonicalUrl || '',
+        headline: article.headline || '',
         published_at: article.datePublished,
         modified_at: article.dateModified,
         author: article.author,
-        language: article.inLanguage,
+        language: article.inLanguage || '',
         main_image: article.mainImage,
         description: article.description,
-        text: article.articleBody,
-        html: article.articleBodyHtml,
+        text: article.articleBody || '',
+        html: article.articleBodyHtml || '',
         probability: article.probability,
         length: article.articleBody ? article.articleBody.split(' ').length : null
       }
