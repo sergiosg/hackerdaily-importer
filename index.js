@@ -4,4 +4,4 @@ const updateItems = require('./updateItems')
 importNewItems()
 updateItems()
 
-setInterval(updateItems, 10000)
+setInterval(updateItems, 25000)
