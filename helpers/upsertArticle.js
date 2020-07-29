@@ -36,6 +36,11 @@ module.exports = async ({ url, score }) => {
     // Scrape the article from Scrapinghub
     const [{ article }] = await queryScrapinghub(url)
 
+    // Strip the article tags from the HTML
+    const strippedHtml = article.articleBodyHtml
+      ? article.articleBodyHtml.replace(/^<article>/, '').replace(/<\/article>$/, '')
+      : ''
+
     // If the Scrapinghub api returned an article, add it to the HackerDaily database
     if (article) {
       const articleFields = {
@@ -48,7 +53,7 @@ module.exports = async ({ url, score }) => {
         main_image: article.mainImage,
         description: article.description,
         text: article.articleBody || '',
-        html: article.articleBodyHtml || '',
+        html: strippedHtml,
         probability: article.probability,
         length: article.articleBody ? article.articleBody.split(' ').length : null
       }
