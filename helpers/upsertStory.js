@@ -29,7 +29,7 @@ module.exports = async ({ id, by, title, text, url = null, score, descendants, d
   // Create or update the webpage item if the item has a URL
   if (url) {
     await queryHackerDaily(upsertWebpageQuery, { url })
-    await upsertArticle({ url, score })
+    if (score > 40) await upsertArticle(url)
   }
 
   const story = {

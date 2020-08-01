@@ -27,12 +27,19 @@ const updateWebpageQuery = `
   }
 `
 
-module.exports = async ({ url, score }) => {
+/**
+* upsertArticle - Insert or update an article
+*
+* @param {String} url The URL of the article
+*
+* @return {void}
+*/
+module.exports = async (url) => {
   // Fetch the webpage from HackerDaily
   const { webpage } = await queryHackerDaily(findWebpageQuery, { url })
 
-  // Check if the webpage exists and has more or equal than 19 points, but does not yet have an article
-  if (webpage && !webpage.article_id && score >= 19) {
+  // Check if the webpage exists but does not yet have an article
+  if (webpage && !webpage.article_id) {
     // Scrape the article from Scrapinghub
     const [{ article }] = await queryScrapinghub(url)
 
