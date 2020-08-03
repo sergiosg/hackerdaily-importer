@@ -12,6 +12,7 @@
     "get-urls": "^9.2.1",
     "graphql-request": "^2.1.0-next.1",
     "node-fetch": "^2.6.0",
+    "sentiment": "^5.0.2",
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
