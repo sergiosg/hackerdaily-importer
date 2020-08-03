@@ -6,6 +6,7 @@ const findWebpageQuery = `
     webpage(url: $url) {
       url
       article_id
+      not_an_article
     }
   }
 `
@@ -27,6 +28,30 @@ const updateWebpageQuery = `
   }
 `
 
+const notAnArticleQuery = `
+  mutation ($url: String!) {
+    update_webpage(pk_columns: {url: $url}, _set: {not_an_article: true}) {
+      url
+    }
+  }
+`
+
+/**
+ * checkIfValidArticle - Check if the article looks valid enough
+ *
+ * @param {Object} article The article object from Scrapinghub
+ *
+ * @return {Boolean} Whether or not it is a valid article
+ */
+const checkIfValidArticle = (article) => {
+  if (!article) return false
+
+  const requiredFields = ['headline', 'inLanguage', 'articleBody', 'articleBodyHtml', 'probability']
+  const containsAllRequiredFields = requiredFields.every(field => article[field] !== undefined)
+
+  return containsAllRequiredFields && article.probability > 0.05
+}
+
 /**
 * upsertArticle - Insert or update an article
 *
@@ -39,27 +64,28 @@ module.exports = async (url) => {
   const { webpage } = await queryHackerDaily(findWebpageQuery, { url })
 
   // Check if the webpage exists but does not yet have an article
-  if (webpage && !webpage.article_id) {
+  if (webpage && !webpage.article_id && !webpage.not_an_article) {
     // Scrape the article from Scrapinghub
     const [{ article }] = await queryScrapinghub(url)
 
-    // If the Scrapinghub api returned an article, add it to the HackerDaily database
-    if (article) {
+    // If it is a valid article, add it to the HackerDaily database,
+    // otherwise set not_an_article to true
+    if (checkIfValidArticle(article)) {
       // Strip the article tags from the HTML
       const strippedHtml = article.articleBodyHtml
         ? article.articleBodyHtml.replace(/^<article>/, '').replace(/<\/article>$/, '')
         : ''
 
       const articleFields = {
-        canonical_url: article.canonicalUrl || '',
-        headline: article.headline || '',
+        canonical_url: article.canonicalUrl || url,
+        headline: article.headline,
         published_at: article.datePublished,
         modified_at: article.dateModified,
         author: article.author,
-        language: article.inLanguage || '',
+        language: article.inLanguage,
         main_image: article.mainImage,
         description: article.description,
-        text: article.articleBody || '',
+        text: article.articleBody,
         html: strippedHtml,
         probability: article.probability,
         length: article.articleBody ? article.articleBody.split(' ').length : null
@@ -71,6 +97,8 @@ module.exports = async (url) => {
       if (response && response.insert_article && response.insert_article.id) {
         await queryHackerDaily(updateWebpageQuery, { url, article: response.insert_article.id })
       }
+    } else {
+      await queryHackerDaily(notAnArticleQuery, { url })
     }
   }
 }
