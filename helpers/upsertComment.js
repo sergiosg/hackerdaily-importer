@@ -50,6 +50,7 @@ module.exports = async ({ id, by, text, parent, time, deleted = false, dead = fa
     text,
     deleted,
     dead,
+    length: text ? text.split(' ').length : null,
     sentiment: measureSentiment(text),
     user_id: by,
     story_id: story,
