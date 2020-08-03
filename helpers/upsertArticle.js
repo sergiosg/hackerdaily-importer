@@ -1,3 +1,5 @@
+const getUrls = require('get-urls')
+const parse = require('url-parse')
 const queryHackerDaily = require('./queryHackerDaily')
 const queryScrapinghub = require('./queryScrapinghub')
 
@@ -35,6 +37,32 @@ const notAnArticleQuery = `
     }
   }
 `
+
+/**
+ * mainImageIsInArticle - Check if the main image is also used in the article
+ *
+ * @param {String!} html The HTML of the article
+ * @param {String!} mainImageUrl The URL of the image
+ *
+ * @return {Boolean!} Whether or not the image is in the article
+ */
+const mainImageIsInArticle = (html, mainImageUrl) => {
+  if (!mainImageUrl || typeof mainImageUrl !== 'string') return false
+
+  // Get the path of the main image
+  const parsedMainImage = parse(mainImageUrl)
+  const mainImagePath = parsedMainImage.origin + parsedMainImage.pathname
+
+  // Get an array with all urls in the article
+  const urlsInArticle = Array.from(getUrls(html))
+
+  // Check if any of the URL's are equal to the of main image
+  return urlsInArticle.some(url => {
+    const parsedImage = parse(url)
+    const imagePath = parsedImage.origin + parsedImage.pathname
+    return imagePath === mainImagePath
+  })
+}
 
 /**
  * checkIfValidArticle - Check if the article looks valid enough
@@ -84,6 +112,7 @@ module.exports = async (url) => {
         author: article.author,
         language: article.inLanguage,
         main_image: article.mainImage,
+        main_image_unique: !mainImageIsInArticle(strippedHtml, article.mainImage),
         description: article.description,
         text: article.articleBody,
         html: strippedHtml,
