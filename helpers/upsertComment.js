@@ -5,10 +5,20 @@ const unixToIsoString = require('./unixToIsoString')
 
 var sentiment = new Sentiment()
 
-const query = `
+const upsertQuery = `
   mutation ($comment: comments_insert_input!) {
     insert_comment(object: $comment, on_conflict: {constraint: comments_pkey, update_columns: [text, user_id, story_id, parent_comment_id, sentiment]}) {
       id
+      created_at
+      updated_at
+    }
+  }
+`
+
+const incrementAscendantQuery = `
+  mutation ($id: Int!) {
+    update_comment(pk_columns: {id: $id}, _inc: {descendants: 1}) {
+      parent_comment_id
     }
   }
 `
@@ -35,6 +45,20 @@ const measureSentiment = (text) => {
 }
 
 /**
+ * incrementAscendants - Increment the descendants of the comment and
+ * recursively for all parent comments as well
+ *
+ * @param {Integer} id The comment that needs to be updated
+ *
+ * @return {void}
+ */
+const incrementAscendants = async id => {
+  const response = await queryHackerDaily(incrementAscendantQuery, { id })
+  const parentCommentId = response && response.update_comment.parent_comment_id
+  if (parentCommentId) incrementAscendants(parentCommentId)
+}
+
+/**
   * upsertComment - Create or update a comment in the HackerDaily back-end
   *
   * @param {object} comment Comment that gets created/updated
@@ -58,5 +82,11 @@ module.exports = async ({ id, by, text, parent, time, deleted = false, dead = fa
     posted_at: unixToIsoString(time)
   }
 
-  await queryHackerDaily(query, { comment })
+  const upsertedComment = await queryHackerDaily(upsertQuery, { comment })
+
+  // Increment the descendants field of all the ascendants of the comment
+  // if its a new comment
+  if (parentComment && upsertedComment.created_at === upsertedComment.updated_at) {
+    incrementAscendants(parentComment)
+  }
 }
