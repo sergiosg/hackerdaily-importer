@@ -39,14 +39,14 @@ const notAnArticleQuery = `
 `
 
 /**
- * mainImageIsInArticle - Check if the main image is also used in the article
+ * checkIfMainImageUnique - Check if the main image is not also used in the article
  *
  * @param {String!} html The HTML of the article
  * @param {String!} mainImageUrl The URL of the image
  *
  * @return {Boolean!} Whether or not the image is in the article
  */
-const mainImageIsInArticle = (html, mainImageUrl) => {
+const checkIfMainImageUnique = (html, mainImageUrl) => {
   if (!mainImageUrl || typeof mainImageUrl !== 'string') return false
 
   // Get the path of the main image
@@ -57,11 +57,13 @@ const mainImageIsInArticle = (html, mainImageUrl) => {
   const urlsInArticle = Array.from(getUrls(html))
 
   // Check if any of the URL's are equal to the of main image
-  return urlsInArticle.some(url => {
+  const mainImageIsInArticle = urlsInArticle.some(url => {
     const parsedImage = parse(url)
     const imagePath = parsedImage.hostname + parsedImage.pathname
     return imagePath === mainImagePath
   })
+
+  return !mainImageIsInArticle
 }
 
 /**
@@ -112,7 +114,7 @@ module.exports = async (url) => {
         author: article.author,
         language: article.inLanguage,
         main_image: article.mainImage,
-        main_image_unique: !mainImageIsInArticle(strippedHtml, article.mainImage),
+        main_image_unique: checkIfMainImageUnique(strippedHtml, article.mainImage),
         description: article.description,
         text: article.articleBody,
         html: strippedHtml,
