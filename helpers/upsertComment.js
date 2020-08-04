@@ -31,7 +31,7 @@ const measureSentiment = (text) => {
     .replace(/&#x27;/g, '\'')
 
   const { comparative } = sentiment.analyze(cleanedText)
-  return Math.min(Math.max(comparative + 1, 2, 0.5), 1.5)
+  return Math.min(Math.max(comparative + 1, 0.5), 1.5)
 }
 
 /**
