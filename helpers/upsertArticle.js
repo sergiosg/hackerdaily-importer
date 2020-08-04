@@ -51,7 +51,7 @@ const mainImageIsInArticle = (html, mainImageUrl) => {
 
   // Get the path of the main image
   const parsedMainImage = parse(mainImageUrl)
-  const mainImagePath = parsedMainImage.origin + parsedMainImage.pathname
+  const mainImagePath = parsedMainImage.hostname + parsedMainImage.pathname
 
   // Get an array with all urls in the article
   const urlsInArticle = Array.from(getUrls(html))
@@ -59,7 +59,7 @@ const mainImageIsInArticle = (html, mainImageUrl) => {
   // Check if any of the URL's are equal to the of main image
   return urlsInArticle.some(url => {
     const parsedImage = parse(url)
-    const imagePath = parsedImage.origin + parsedImage.pathname
+    const imagePath = parsedImage.hostname + parsedImage.pathname
     return imagePath === mainImagePath
   })
 }
