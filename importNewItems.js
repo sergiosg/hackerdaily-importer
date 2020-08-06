@@ -16,9 +16,10 @@ module.exports = async () => {
     const item = await upsertItem(itemId)
 
     // Update to the console
-    const itemType = item ? item.type : 'null'
-    const percentageDone = ((itemId - itemsToFetch[0]) / itemsToFetch.length * 100).toFixed(3)
-    console.log(`${itemType.padEnd(7)} - ${item.id} (${percentageDone}%)`)
+    if (item) {
+      const percentageDone = ((itemId - itemsToFetch[0]) / itemsToFetch.length * 100).toFixed(3)
+      console.log(`${item.type.padEnd(7)} - ${item.id} (${percentageDone}%)`)
+    }
   }
   console.log('Finished!')
 }
