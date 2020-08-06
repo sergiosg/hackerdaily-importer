@@ -82,6 +82,23 @@ const checkIfValidArticle = (article) => {
   return containsAllRequiredFields && article.probability > 0.05
 }
 
+const beautifyHtml = (html, url) => {
+  if (!html) return null
+
+  // Remove the the article tags
+  let beautifiedHtml = html.replace(/^<article>/, '').replace(/<\/article>$/, '')
+
+  // Remove the edit tags and the contents table from Wikipedia articles
+  if (url.includes('wikipedia.org')) {
+    const editRegex = /<h2>(.+)\[<a href=".*?" title=".*?">edit<\/a>\]<\/h2>/g
+    beautifiedHtml = beautifiedHtml.replace(editRegex, '<h2>$1</h2>')
+
+    const contentsRegex = /<h2>Contents<\/h2>\s*<ul>.*?<\/ul>/
+    beautifiedHtml = beautifiedHtml.replace(contentsRegex, '')
+  }
+  return beautifiedHtml
+}
+
 /**
 * upsertArticle - Insert or update an article
 *
@@ -101,11 +118,6 @@ module.exports = async (url) => {
     // If it is a valid article, add it to the HackerDaily database,
     // otherwise set not_an_article to true
     if (checkIfValidArticle(article)) {
-      // Strip the article tags from the HTML
-      const strippedHtml = article.articleBodyHtml
-        ? article.articleBodyHtml.replace(/^<article>/, '').replace(/<\/article>$/, '')
-        : ''
-
       const articleFields = {
         canonical_url: article.canonicalUrl || url,
         headline: article.headline,
@@ -114,10 +126,10 @@ module.exports = async (url) => {
         author: article.author,
         language: article.inLanguage,
         main_image: article.mainImage,
-        main_image_unique: checkIfMainImageUnique(strippedHtml, article.mainImage),
+        main_image_unique: checkIfMainImageUnique(article.articleBodyHtml, article.mainImage),
         description: article.description,
         text: article.articleBody,
-        html: strippedHtml,
+        html: beautifyHtml(article.articleBodyHtml, article.canonicalUrl || url),
         probability: article.probability,
         length: article.articleBody ? article.articleBody.split(' ').length : null
       }
