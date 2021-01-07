@@ -27,10 +27,10 @@ module.exports = async () => {
   const { stories, comments } = await queryHackerDaily(allStoryAndCommentIds)
   const items = [...stories.map(({ id }) => id), ...comments.map(({ id }) => id)].sort()
 
-  const minExistingItem = items[0] || maxNewItem - 20000
+  const firstItemToFetch = Math.max(items[0], maxNewItem - 10000)
 
   const itemsToFetch = []
-  for (let i = minExistingItem; i <= maxNewItem; i++) {
+  for (let i = firstItemToFetch; i <= maxNewItem; i++) {
     if (!items.includes(i)) itemsToFetch.push(i)
   }
 
