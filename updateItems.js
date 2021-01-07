@@ -2,6 +2,7 @@ const queryHackerNews = require('./helpers/queryHackerNews')
 const fetchOldestSavedItem = require('./helpers/fetchOldestSavedItem')
 const upsertUser = require('./helpers/upsertUser')
 const upsertItem = require('./helpers/upsertItem')
+const sendHeartbeat = require('./helpers/sendHeartbeat')
 
 /**
  * randomTimeout - Wait a random amount of time before executing the function
@@ -41,4 +42,5 @@ module.exports = async () => {
   ])
 
   console.log(`Updated ${updates.items.length} items and ${updates.profiles.length} users`)
+  sendHeartbeat()
 }
