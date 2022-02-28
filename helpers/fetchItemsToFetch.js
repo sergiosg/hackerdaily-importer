@@ -3,11 +3,13 @@ const queryHackerDaily = require('./queryHackerDaily')
 
 const allStoryAndCommentIds = `
 {
-  stories {
+  stories(order_by: {id: desc}, limit: 1) {
     id
+    created_at
   }
-  comments {
+  comments(order_by: {id: desc}, limit: 1) {
     id
+    created_at
   }
 }
 `
@@ -25,9 +27,7 @@ module.exports = async () => {
     throw new Error('Max item on HN is not defined')
   }
   console.log(1)
-  const abc = await queryHackerDaily(allStoryAndCommentIds)
-  console.log('ABC', abc)
-  const { stories, comments } = abc
+  const { stories, comments } = await queryHackerDaily(allStoryAndCommentIds)
   console.log('STORIES, COMMENTS', stories, comments)
   console.log(2)
   const items = [...stories.map(({ id }) => id), ...comments.map(({ id }) => id)].sort()
